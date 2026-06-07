@@ -18,14 +18,32 @@ jobs:
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: 'projects/791907021272/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
-          service_account: 'terraform-deployer@hr-management-2025.iam.gserviceaccount.com'
+          workload_identity_provider: projects/791907021272/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider
+          service_account: terraform-deployer@hr-management-2025.iam.gserviceaccount.com
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init
         run: terraform init
+
+      - name: Terraform Plan - Artifact Registry
+        run: terraform plan -target=google_artifact_registry_repository.repo
+
+      - name: Terraform Apply - Artifact Registry
+        run: terraform apply -auto-approve -target=google_artifact_registry_repository.repo
+
+      - name: Build Docker image
+        run: docker build -t us-central1-docker.pkg.dev/hr-management-2025/calculator-repo-ga/calculator:latest .
+
+      - name: Push Docker image
+        run: docker push us-central1-docker.pkg.dev/hr-management-2025/calculator-repo-ga/calculator:latest
 
       - name: Terraform Plan
         run: terraform plan
