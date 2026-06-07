@@ -34,10 +34,10 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan - Artifact Registry
-        run: terraform plan -target=google_artifact_registry_repository.repo
+        run: terraform plan -target=module.artifact_registry
 
       - name: Terraform Apply - Artifact Registry
-        run: terraform apply -auto-approve -target=google_artifact_registry_repository.repo
+        run: terraform apply -auto-approve -target=module.artifact_registry
 
       - name: Build Docker image
         run: docker build -t us-central1-docker.pkg.dev/hr-management-2025/calculator-repo-ga/calculator:latest .
