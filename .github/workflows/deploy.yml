@@ -7,6 +7,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout code
@@ -15,7 +18,8 @@ jobs:
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          workload_identity_provider: 'projects/791907021272/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
+          service_account: 'terraform-deployer@hr-management-2025.iam.gserviceaccount.com'
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
