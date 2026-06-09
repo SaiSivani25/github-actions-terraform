@@ -3,6 +3,7 @@ name: Deploy to GCP
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -16,16 +17,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Authenticate to GCP
+        id: auth
         uses: google-github-actions/auth@v1
         with:
           workload_identity_provider: projects/791907021272/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider
           service_account: terraform-deployer@hr-management-2025.iam.gserviceaccount.com
-
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+          token_format: access_token
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -39,11 +36,22 @@ jobs:
       - name: Terraform Apply - Artifact Registry
         run: terraform apply -auto-approve -target=module.artifact_registry
 
-      - name: Build Docker image
-        run: docker build -t us-central1-docker.pkg.dev/hr-management-2025/calculator-repo-ga/calculator:latest .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Push Docker image
-        run: docker push us-central1-docker.pkg.dev/hr-management-2025/calculator-repo-ga/calculator:latest
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: us-central1-docker.pkg.dev/hr-management-2025/calculator-repo-ga/calculator:latest
 
       - name: Terraform Plan
         run: terraform plan
