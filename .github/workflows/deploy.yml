@@ -16,18 +16,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Authenticate to GCP
         id: auth
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/791907021272/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider
           service_account: terraform-deployer@hr-management-2025.iam.gserviceaccount.com
           token_format: access_token
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
@@ -49,7 +49,7 @@ jobs:
           password: ${{ steps.auth.outputs.access_token }}
 
       - name: Build and Push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
