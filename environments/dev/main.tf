@@ -10,9 +10,10 @@ module "artifact_registry" {
 }
 
 module "cloud_run" {
-  source       = "../../modules/cloud_run"
-  project_id   = var.project_id
-  region       = var.region
-  service_name = "calculator-app-${var.environment}"
-  image        = "${var.region}-docker.pkg.dev/${var.project_id}/calculator-repo-${var.environment}/calculator:latest"
+  source              = "../../modules/cloud_run"
+  project_id          = var.project_id
+  region              = var.region
+  service_name        = "calculator-app-${var.environment}"
+  image               = "${var.region}-docker.pkg.dev/${var.project_id}/calculator-repo-${var.environment}/calculator:latest"
+  deletion_protection = false
 }

@@ -1,7 +1,7 @@
 resource "google_cloud_run_v2_service" "calculator" {
   name     = var.service_name
   location = var.region
-
+  deletion_protection = var.deletion_protection
   template {
     containers {
       image = var.image
