@@ -23,3 +23,10 @@ variable "deletion_protection" {
   description = "Enable deletion protection for Cloud Run service"
   type        = bool
 }
+
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "dev"
+}

@@ -16,4 +16,5 @@ module "cloud_run" {
   service_name        = "calculator-app-${var.environment}"
   image               = "${var.region}-docker.pkg.dev/${var.project_id}/calculator-repo-${var.environment}/calculator:latest"
   deletion_protection = true
+  environment        = var.environment
 }
