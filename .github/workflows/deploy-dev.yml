@@ -1,0 +1,59 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+jobs:
+  deploy-dev:
+    name: Deploy to Dev Environment
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/791907021272/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
+          service_account: 'terraform-deployer@hr-management-2025.iam.gserviceaccount.com'
+          token_format: access_token
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: environments/dev
+
+      - name: Terraform Plan
+        run: terraform plan
+        working-directory: environments/dev
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: environments/dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: us-central1-docker.pkg.dev/hr-management-2025/calculator-repo-dev/calculator:latest
