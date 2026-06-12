@@ -33,12 +33,12 @@ jobs:
         run: terraform init
         working-directory: environments/stage
 
-      - name: Terraform Plan
-        run: terraform plan
+      - name: Terraform Plan - Artifact Registry
+        run: terraform plan -target=module.artifact_registry
         working-directory: environments/stage
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      - name: Terraform Apply - Artifact Registry
+        run: terraform apply -auto-approve -target=module.artifact_registry
         working-directory: environments/stage
 
       - name: Set up Docker Buildx
@@ -57,3 +57,11 @@ jobs:
           context: .
           push: true
           tags: us-central1-docker.pkg.dev/hr-management-2025/calculator-repo-stage/calculator:latest
+
+      - name: Terraform Plan
+        run: terraform plan
+        working-directory: environments/stage
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: environments/stage
