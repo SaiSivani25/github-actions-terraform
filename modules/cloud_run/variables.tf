@@ -17,3 +17,9 @@ variable "project_id" {
   description = "GCP Project ID"
   type        = string
 }
+
+variable "deletion_protection" {
+  default     = false
+  description = "Enable deletion protection for Cloud Run service"
+  type        = bool
+}
