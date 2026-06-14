@@ -1,3 +1,4 @@
+# Stage environment deployment workflow
 name: Deploy to Stage
 
 on:
