@@ -32,4 +32,5 @@ module "monitoring" {
   service_name = "calculator-app-${var.environment}"
   alert_email  = data.google_secret_manager_secret_version.alert_email.secret_data
   environment  = var.environment
+  cloud_run_url = module.cloud_run.service_url
 }

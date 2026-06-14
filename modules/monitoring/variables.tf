@@ -22,3 +22,8 @@ variable "environment" {
   description = "Environment name"
   type        = string
 }
+
+variable "cloud_run_url" {
+  description = "Cloud Run service URL"
+  type        = string
+}

@@ -27,7 +27,7 @@ resource "google_monitoring_uptime_check_config" "http" {
     type = "uptime_url"
     labels = {
       project_id = var.project_id
-      host       = "${var.service_name}-${var.project_id}.${var.region}.run.app"
+      host       = trimprefix(var.cloud_run_url, "https://")
     }
   }
 }
@@ -46,10 +46,10 @@ resource "google_monitoring_alert_policy" "uptime_alert" {
       comparison      = "COMPARISON_LT"
       threshold_value = 1
       aggregations {
-        alignment_period   = "300s"
-        per_series_aligner = "ALIGN_NEXT_OLDER"
+        alignment_period     = "300s"
+        per_series_aligner   = "ALIGN_NEXT_OLDER"
         cross_series_reducer = "REDUCE_COUNT_FALSE"
-        group_by_fields    = ["resource.label.host"]
+        group_by_fields      = ["resource.label.host"]
       }
     }
   }
